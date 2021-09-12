@@ -1,7 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-
+VAGRANTFILE_API_VERSION = "2"
 BOX_NAME = "symbols/ubuntu-docker"
+PROVIDER = "vmware_desktop"  # "virtualbox"
 MEMORY = "512"
 CPUS = 2
 
@@ -10,13 +11,11 @@ MANAGER_IP = ["192.168.33.2", "192.168.33.3"]
 WORKERS = 1
 WORKER_IP = ["192.168.33.4"]
 
-VAGRANTFILE_API_VERSION = "2"
-
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     #Common setup
     config.vm.box = BOX_NAME
-    config.vm.synced_folder ".", "/vagrant"
-    config.vm.provider "vmware_desktop" do |vb|
+    config.vm.synced_folder "./src", "/src"
+    config.vm.provider PROVIDER do |vb|
       vb.memory = MEMORY
       vb.cpus = CPUS
     end
@@ -25,11 +24,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         config.vm.define "manager0#{i}" do |manager|
           manager.vm.network :private_network, ip: MANAGER_IP[i-1]
           manager.vm.hostname = "manager0#{i}"
-          if i == 1  # Server Manager đầu tiên của Docker Swarm
-            #Only configure port to host for Manager01
-            manager.vm.network :forwarded_port, guest: 8080, host: 8080
-            manager.vm.network :forwarded_port, guest: 5000, host: 5000
+          if i == 1  # Server Manager đầu tiên của Docker Swarm      
             manager.vm.network :forwarded_port, guest: 9000, host: 9000
+            manager.vm.network :forwarded_port, guest: 8080, host: 8080
+            manager.vm.network :forwarded_port, guest: 8000, host: 8000
+            manager.vm.network :forwarded_port, guest: 8001, host: 8001
+            manager.vm.network :forwarded_port, guest: 8002, host: 8002
+            manager.vm.network :forwarded_port, guest: 5000, host: 5000
+            manager.vm.network :forwarded_port, guest: 5432, host: 5432
+            manager.vm.network :forwarded_port, guest: 6379, host: 6379
           end
         end
     end

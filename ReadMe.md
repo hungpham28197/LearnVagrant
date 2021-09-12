@@ -6,6 +6,8 @@ Hỏi: Vagrant để làm gì?
 
 Đáp: Vagrant là một công cụ tương tác với các nền tảng ảo hóa như VirtualBox, HyperV, VM ..., nó giúp tạo và quản lý các máy ảo trên các nền tảng đó. Vagrant cung cấp một cấu hình đơn giản tạo và quản lý, tương tác với máy ảo mà không có nhiều sự khác biệt dù bạn đang sử dụng VirtualBox, VM hay HyperV.
 
+> Vagrant tạo máy ảo (virtual machine) trên một máy tính vật lý. Docker Swarm gồm nhiều node. Do đó cần phải dùng Vagrant để tạo ra nhiều máy ảo, sau đó triển khai Docker Swarm lên đó.
+
 Khi chúng ta muốn giả lập Docker Swarm gồm nhiều máy ảo tham gia hệ thống Swarm nên dùng Vagrant. Có cách thủ công là tạo từng máy ảo nhưng sẽ làm thủ công và không thực hiện lại được nhanh ở môi trường vật lý khác.
 
 
@@ -16,6 +18,10 @@ Hỏi: Vagrant của công ty nào?
 Hỏi: Tài liệu học nhanh Vagrant bằng tiếng Việt
 
 Đáp: [Sử dụng Vagrant tạo và quản lý máy ảo](https://xuanthulab.net/su-dung-vagrant-tao-va-quan-ly-may-ao.html)
+
+Hỏi: Vào đâu để tìm cách ảnh của hệ điều hành?
+
+Đáp: https://app.vagrantup.com/boxes/search
 
 Hỏi: Dùng Vagrant để triển khai Docker Swarm như thế nào?
 

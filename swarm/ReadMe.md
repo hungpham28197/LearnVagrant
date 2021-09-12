@@ -122,13 +122,15 @@ services:
   web:
     image: nginx:alpine
     ports:
-    - "8080:80"
+    - "8001:80"
 ```
+
 ![](img/ngix.jpg)
 
 Xem Swarm Cluster
 ![](img/swarm_cluster.jpg)
 
+Mở trình duyệt tới địa chỉ http://localhost:8001
 
 ## Deploy WhoAmI
 
@@ -140,4 +142,17 @@ services:
     image: containous/whoami:dev
     ports:
     - "5000:80"
+```
+
+## Deploy Redis
+```yaml
+version: "3.8"
+services:
+ redis:
+    image: "redis:alpine"
+    command: redis-server --requirepass abc123
+    ports:
+     - "6379:6379"
+    environment:
+     - REDIS_REPLICATION_MODE=master
 ```
