@@ -268,6 +268,7 @@ BUG_REPORT_URL="https://bugs.alpinelinux.org/"
 Triển khai redis cluster trên 2 node:
 + Node master ở máy ảo manager01
 + Node slave ở máy áo manager02
+
 Đầu tiên cần tạo folder trên để mount data redis trên 2 máy áo này:
 ```
 vagrant ssh manager01
