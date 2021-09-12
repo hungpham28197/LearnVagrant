@@ -1,5 +1,5 @@
 Tham khảo [Learn Docker Swarm with Vagrant](https://levelup.gitconnected.com/learn-docker-swarm-with-vagrant-47dd52b57bcc)
-## Khởi tạo 4 máy ảo
+## Khởi tạo 3 máy ảo
 ```
 $ vagrant up
 ```
@@ -61,19 +61,15 @@ $ vagrant up
    ```
    docker swarm join --token SWMTKN-1-1t4mi73lltrxg3ipxxoxh1v0ofe6knlmis81qezkngp62gyzmk-8zeuc96e7ah5lh8f8kbfi0nzn 192.168.33.2:2377
    ```
-## Thực hành trên worker02
-1. SSH vào worker02
-   ```
-   $ vagrant ssh worker02
-   ```
-2. Gõ lệnh để join docker swarm dưới role worker
-   ```
-   docker swarm join --token SWMTKN-1-1t4mi73lltrxg3ipxxoxh1v0ofe6knlmis81qezkngp62gyzmk-8zeuc96e7ah5lh8f8kbfi0nzn 192.168.33.2:2377
-   ```
+
 
 ## Liệt kê các node trong docker swarm
 ```
 $ docker node ls
+ID                            HOSTNAME    STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
+6dijd48m3lcmk99835342n7om *   manager01   Ready     Active         Leader           20.10.7
+76cyxv9mp1wmpa2bhn97mkn6k     manager02   Ready     Active         Reachable        20.10.7
+ihiwerjs86p7uv3czx7x91obl     worker01    Ready     Active                          20.10.7
 ```
 
 ## Quay lại manager01 cài Portainer
@@ -105,14 +101,43 @@ end
 
 Giờ bạn chỉ cần vào `http://localhost:9000` là thấy được giao diện của Portainer
 
-## Thực hành xong thì tạm thời suspend
+## Thực hành xong thì tạm thời dừng
 
 Gõ lệnh
 ```
-$ vagrant suspend
+$ vagrant halt
 ```
 
 Khi nào cần dùng lại
 ```
-$ vagrant resume
+$ vagrant up
+```
+
+## Deploy Nginx lên Portainer
+
+```yaml
+version: "3.8"
+
+services:
+  web:
+    image: nginx:alpine
+    ports:
+    - "8080:80"
+```
+![](img/ngix.jpg)
+
+Xem Swarm Cluster
+![](img/swarm_cluster.jpg)
+
+
+## Deploy WhoAmI
+
+```yaml
+version: "3.8"
+
+services:
+   whoami:
+    image: containous/whoami:dev
+    ports:
+    - "5000:80"
 ```

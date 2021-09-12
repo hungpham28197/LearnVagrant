@@ -3,11 +3,13 @@
 
 BOX_NAME = "symbols/ubuntu-docker"
 MEMORY = "512"
+CPUS = 2
+
 MANAGERS = 2
 MANAGER_IP = ["192.168.33.2", "192.168.33.3"]
-WORKERS = 2
-WORKER_IP = ["192.168.33.4", "192.168.33.5"]
-CPUS = 2
+WORKERS = 1
+WORKER_IP = ["192.168.33.4"]
+
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|

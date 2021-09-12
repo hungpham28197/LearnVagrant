@@ -44,3 +44,10 @@ Hãy tham khảo
 1. [Vagrant khởi động máy ảo Ubuntu chứa Nginx web server](Nginx)
 2. [Vagrant khởi động máy ảo Ubuntu chứa Docker]
 3. [Vagrant khởi động 4 máy ảo Ubutun: 2 Managers, 2 Workers](swarm/ReadMe.md)
+
+## Các lệnh phổ biến
+
+```
+vagrant up
+vagrant box update
+```
