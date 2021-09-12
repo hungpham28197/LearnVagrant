@@ -156,3 +156,110 @@ services:
     environment:
      - REDIS_REPLICATION_MODE=master
 ```
+
+## Deploy Docker Registry
+Triển khai docker registry ở đúng node `manager02` xem lệnh `constraints: [node.hostname == manager02]`
+
+```yaml
+version: "3.8"
+services:
+ registry:
+    image: "registry:latest"
+    restart: always  
+    ports:
+     - "5000:5000"
+    deploy:
+      placement:
+        constraints: [node.hostname == manager02]
+
+```
+
+## Cấu hình cho phép truy cập insecured Docker Registry
+Docker Registry server mặc định yêu cầu HTTPs để phục vụ. Trong môi trường thử nghiệm Vagrant trên local, không bật được HTTPS thì chúng ta cấu hình kết nối vào insecured docker registry.
+
+Kết nối SSH vào manager01
+```
+$ vagrant ssh manager01
+```
+
+Chuyển sang root rồi tạo file `/etc/docker/daemon.json`
+```
+$ sudo -i
+$ nano /etc/docker/daemon.json
+```
+
+Thêm nội dung như sau
+```json
+{
+    "insecure-registries" : [ "manager02:5000" ]
+}
+```
+
+Cần đảm bảo file `/etc/hosts` đã chứa
+```
+192.168.33.2 manager01
+192.168.33.3 manager02
+192.168.33.4 worker01
+```
+
+Khởi động lại Docker daemon
+```
+$ sudo systemctl daemon-reload
+$ sudo systemctl restart docker
+```
+
+Vào thư mục [src](src) gõ lệnh
+```
+$ docker build . -t iam:latest
+$ docker run -d --name iam -p 8001:8001 iam:latest
+
+
+$ docker image tag iam:latest manager02:5000/iam:latest
+$ docker image push manager02:5000/iam:latest
+```
+
+
+## Deploy ứng dụng Golang trong máy ảo Vagrant
+Hiện tại Vagrant tạo ra 3 máy ảo Ubuntu 18.x lần lượt là:
+- manager01
+- manager02
+- worker01
+
+Trong thư mục [/src](/src) lưu một dự án Golang đơn giản
+
+Trong file [Vagrantfile](Swarm/Vagrantfile) có đoạn lệnh cấu hình như sau
+
+```ruby
+config.vm.synced_folder "./src", "/src"
+```
+
+Nó map thư mục [/src](/src) vào thư mục src của máy ảo. Có thể tuỳ biến synced_folder cho từng máy ảo một.
+
+Xem chi tiết ở [src](src/ReadMe.md)
+
+Sau khi đã push thành công `manager02:5000/iam:latest`
+
+Thì tạo Stack với Docker-compose như sau
+
+```yaml
+version: "3.8"
+
+services:
+   iam:
+    image: manager02:5000/iam:latest
+    ports:
+    - "8001:8001"
+```
+Mở trình duyệt vào địa chỉ http://localhost:8001 sẽ thấy
+```
+ceaec9e03857
+10.0.2.13
+NAME="Alpine Linux"
+ID=alpine
+VERSION_ID=3.14.2
+PRETTY_NAME="Alpine Linux v3.14"
+HOME_URL="https://alpinelinux.org/"
+BUG_REPORT_URL="https://bugs.alpinelinux.org/"
+```
+
+![](img/registry_iam.jpg)
