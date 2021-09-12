@@ -263,3 +263,65 @@ BUG_REPORT_URL="https://bugs.alpinelinux.org/"
 ```
 
 ![](img/registry_iam.jpg)
+
+## Deploy redis cluster trong máy ảo Vagrant
+Triển khai redis cluster trên 2 node:
+    + Node master ở máy ảo manager01
+    + Node slave ở máy áo manager02
+Đầu tiên cần tạo folder trên để mount data redis trên 2 máy áo này:
+```
+vagrant ssh manager01
+mkdir /home/vagrant/redis
+```
+```
+vagrant ssh manager02
+mkdir /home/vagrant/redis
+```
+Tiếp đó tạo stack redis trên portainer bằng nội dung sau
+```yaml
+version: "3.8"
+networks:
+  my-network:
+    external: true
+services:
+  redis-master: #tên service
+    image: redis:alpine #tên image
+    command: redis-server --requirepass 123 # set password cho redis
+    ports:
+      - "6379:6379" # ánh xạ cổng 6379 của container ra ngoài cổng 6379 trên máy host
+    volumes:
+      - /home/vagrant/redis:/data # mount volume từ thư mục /data của container ra ngoài thư mục /home/vagrant/redis trên máy host
+    networks:
+      - my-network # network overlay để các container trong Network này có thể giao tiếp được với nhau
+    deploy:
+      placement:
+        constraints: # Chỉ định node quản lý
+          - node.role == manager
+          - node.hostname == manager01
+  redis-slave-1: #tên service
+    image: redis:alpine #tên image
+    command: redis-server --masterauth 123 --slaveof redis-master 6379
+    depends_on:
+      - redis-master
+    ports:
+      - "6380:6379" # ánh xạ cổng 6379 của container ra ngoài cổng 6380 trên máy host
+    volumes:
+      - /home/vagrant/redis:/data # mount volume từ thư mục /data của container ra ngoài thư mục /home/vagrant/redis trên máy host
+    networks:
+      - my-network # Network overlay để các container trong Network này có thể giao tiếp được với nhau
+    deploy:
+      placement:
+        constraints: # Chỉ định node quản lý
+          - node.role == manager
+          - node.hostname == manager02
+```
+Thử xem redis đã cài đặt thành công bằng cách Exec vào các container redis trên 2 máy ảo
+```
+docker exec -it [container ID] /bin/bash
+```
+Xác thực mật khẩu (auth [password])
+
+Insert record (SET key "value") từ manager01
+
+Read record (GET key) từ manager02
+
